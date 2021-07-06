@@ -3,29 +3,18 @@ import fetchCountries from './fetchCountries.js';
 import countryListItemsTemplate from './tamplate/countryListItem.hbs';
 import countriesListTemplate from './tamplate/countrieList.hbs';
 
-import { alert, notice, info, success, error, defaultModules } from '@pnotify/core';
+import { error } from '@pnotify/core';
 import '@pnotify/core/dist/PNotify.css';
-import * as PNotifyMobile from '@pnotify/mobile';
-import '@pnotify/mobile/dist/PNotifyMobile.css';
 import '@pnotify/core/dist/BrightTheme.css';
+import '@pnotify/confirm/dist/PNotifyConfirm.css';
 
 import debounce from 'lodash.debounce';
-
-defaultModules.set(PNotifyMobile, {});
-
-error({
-  text: 'Notice me, senpai!',
-});
 
 const refs = {
   searchForm: document.querySelector('#search-form'),
   countryList: document.querySelector('#country-list'),
   searchInput: document.querySelector('.search__input'),
 };
-
-refs.searchForm.addEventListener('submit', event => {
-  event.preventDefault();
-});
 
 refs.searchForm.addEventListener(
   'input',
@@ -38,7 +27,9 @@ function searchFormInputHandler(e) {
   const searchQuery = e.target.value;
 
   clearListItems();
-
+  if (!searchQuery) {
+    return;
+  }
   fetchCountries(searchQuery).then(data => {
     const markup = buildListItemMarkup(data);
     const renderCountriesList = buildCountriesList(data);
@@ -48,7 +39,17 @@ function searchFormInputHandler(e) {
       insertListItem(renderCountriesList);
     } else if (data.length === 1) {
       insertListItem(markup);
+    } else if (data.length >= 10) {
+      PNotify();
     }
+  });
+}
+
+function PNotify() {
+  error({
+    title: 'Найдено слишком много совпадений!',
+    text: 'Пожалуйста, введите более конкретный запрос!',
+    delay: 750,
   });
 }
 
