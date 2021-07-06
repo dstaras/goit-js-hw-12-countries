@@ -31,13 +31,13 @@ function searchFormInputHandler(e) {
     return;
   }
   fetchCountries(searchQuery).then(data => {
-    const markup = buildListItemMarkup(data);
-    const renderCountriesList = buildCountriesList(data);
     if (!data) {
       return;
     } else if (data.length >= 2 && data.length <= 10) {
+      const renderCountriesList = buildCountriesList(data);
       insertListItem(renderCountriesList);
     } else if (data.length === 1) {
+      const markup = buildListItemMarkup(data);
       insertListItem(markup);
     } else if (data.length >= 10) {
       PNotify();
